@@ -88,10 +88,16 @@ fn info_command(command: InfoCommand) -> UsciResult<()> {
 }
 
 #[derive(Debug, Parser)]
+#[clap(about = "little tool of usci code")]
 enum UsciCommand {
 
+  #[clap(about = "Generate some usci codes")]
   Generate(GenerateCommand),
+
+  #[clap(about = "Check if codes are valid")]
   Verify(VerifyCommand),
+
+  #[clap(about = "Show the information of codes")]
   Info(InfoCommand)
 }
 
