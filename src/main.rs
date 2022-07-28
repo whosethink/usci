@@ -1,6 +1,6 @@
 mod usci;
 
-use std::io::{BufRead, BufReader, stdout, Write};
+use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::PathBuf;
 use std::process::exit;
 use std::str::FromStr;
@@ -27,17 +27,25 @@ fn main() {
       exit(0);
     },
     Err(err) => {
-      let _ = writeln!(stdout(), "Error: {}", err);
+      let _ = writeln!(std::io::stdout(), "Error: {}", err);
       exit(1);
     }
   }
 }
 
 fn generate_command(command: GenerateCommand) -> Result<()> {
+  let mut writer: BufWriter<Box<dyn Write>> = match command.file {
+    Some(ref file_path) => {
+      BufWriter::new(Box::new(std::fs::File::create(file_path)?))
+    }
+    None => {
+      BufWriter::new(Box::new(std::io::stdout()))
+    }
+  };
   let mut rng = rand::thread_rng();
   for _ in 0..command.count {
     let code = UsciCode::from_random(&mut rng);
-    writeln!(stdout(), "{}", code.get_code())?;
+    writeln!(writer, "{}", code.get_code())?;
   }
   Ok(())
 }
@@ -123,8 +131,11 @@ enum UsciCommand {
 #[derive(Debug, Parser)]
 struct GenerateCommand {
 
+  #[clap(long = "file", short = 'f')]
+  file: Option<PathBuf>,
+
   #[clap(long = "count", short = 'c', default_value = "1")]
-  count: u32
+  count: u32,
 
 }
 
