@@ -1,7 +1,7 @@
 use std::str::FromStr;
-use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::common::{UsciError, UsciResult};
+use rand::Rng;
+use anyhow::{bail, Result};
 
 #[derive(Debug)]
 pub enum Code01 {
@@ -59,7 +59,7 @@ impl Code01 {
     }
   }
 
-  pub fn from_char(ch: char) -> UsciResult<Self> {
+  pub fn from_char(ch: char) -> Result<Self> {
     match ch {
      '1' => Ok(Code01::C01),
      '2' => Ok(Code01::C02),
@@ -73,7 +73,7 @@ impl Code01 {
      'A' => Ok(Code01::C0A),
      'N' => Ok(Code01::C0N),
      'Y' => Ok(Code01::C0Y),
-      _ => Err(UsciError::CommonError(format!("Parse Code01 Error: {}", ch)))
+      _ => bail!(format!("Parse Code01 Error: {}", ch))
     }
   }
 
@@ -226,7 +226,7 @@ impl Code02 {
     }
   }
 
-  pub fn from_char(code01: &Code01, ch: char) -> UsciResult<Self> {
+  pub fn from_char(code01: &Code01, ch: char) -> Result<Self> {
     match code01 {
       Code01::C01 => {
         match ch {
@@ -234,14 +234,14 @@ impl Code02 {
           '2' => Ok(Code02::D12),
           '3' => Ok(Code02::D13),
           '9' => Ok(Code02::D19),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C02 => {
         match ch {
           '1' => Ok(Code02::E21),
           '2' => Ok(Code02::E29),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C03 => {
@@ -252,14 +252,14 @@ impl Code02 {
           '4' => Ok(Code02::F34),
           '5' => Ok(Code02::F35),
           '9' => Ok(Code02::F39),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C04 => {
         match ch {
           '1' => Ok(Code02::G41),
           '9' => Ok(Code02::G49),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C05 => {
@@ -268,7 +268,7 @@ impl Code02 {
           '2' => Ok(Code02::H52),
           '3' => Ok(Code02::H53),
           '9' => Ok(Code02::H59),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C06 => {
@@ -276,7 +276,7 @@ impl Code02 {
           '1' => Ok(Code02::I61),
           '2' => Ok(Code02::I62),
           '9' => Ok(Code02::I69),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C07 => {
@@ -284,14 +284,14 @@ impl Code02 {
           '1' => Ok(Code02::J71),
           '2' => Ok(Code02::J72),
           '9' => Ok(Code02::J79),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C08 => {
         match ch {
           '1' => Ok(Code02::K81),
           '9' => Ok(Code02::K89),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C09 => {
@@ -299,14 +299,14 @@ impl Code02 {
           '1' => Ok(Code02::L91),
           '2' => Ok(Code02::L92),
           '3' => Ok(Code02::L93),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C0A => {
         match ch {
           '1' => Ok(Code02::MA1),
           '9' => Ok(Code02::MA9),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C0N => {
@@ -315,13 +315,13 @@ impl Code02 {
           '2' => Ok(Code02::NN2),
           '3' => Ok(Code02::NN3),
           '9' => Ok(Code02::NN9),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
       Code01::C0Y => {
         match ch {
           '1' => Ok(Code02::P01),
-          _ => Err(UsciError::CommonError(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch)))
+          _ => bail!(format!("Parse Code02 Error (Code01: {}): {}", code01.get_code(), ch))
         }
       }
     }
@@ -451,14 +451,14 @@ impl Code03 {
     return "登记管理机关行政区划码";
   }
 
-  pub fn new(code: &str) -> UsciResult<Code03> {
+  pub fn new(code: &str) -> Result<Code03> {
     if code.len() != 6 {
-      return Err(UsciError::CommonError(format!("Parse Code03 Error: {}", code)));
+      bail!(format!("Parse Code03 Error: {}", code));
     }
     let mut code_chars = code.chars();
     while let Some(ch) = code_chars.next() {
       if !Code03::is_valid_char(ch) {
-        return Err(UsciError::CommonError(format!("Parse Code03 Error: {}", code)));
+        bail!(format!("Parse Code03 Error: {}", code));
       }
     }
     return Ok(Code03 { code: code.to_string() });
@@ -499,14 +499,14 @@ impl Code04 {
     return "组织机构代码";
   }
 
-  pub fn new(code: &str) -> UsciResult<Code04> {
+  pub fn new(code: &str) -> Result<Code04> {
     if code.len() != 9 {
-      return Err(UsciError::CommonError(format!("Parse Code04 Error: {}", code)));
+      bail!(format!("Parse Code04 Error: {}", code));
     }
     let mut code_chars = code.chars();
     while let Some(ch) = code_chars.next() {
       if !Code04::is_valid_char(ch) {
-        return Err(UsciError::CommonError(format!("Parse Code04 Error: {}", code)));
+        bail!(format!("Parse Code04 Error: {}", code));
       }
     }
     return Ok(Code04 { code: code.to_string() });
@@ -566,7 +566,7 @@ pub struct UsciCode {
 
 impl UsciCode {
 
-  pub fn calculate_code05(code01: &Code01, code02: &Code02, code03: &Code03, code04: &Code04) -> UsciResult<char> {
+  pub fn calculate_code05(code01: &Code01, code02: &Code02, code03: &Code03, code04: &Code04) -> Result<char> {
     let mut result = 0;
     result = result + UsciCode::calculate_char_weight(code01.get_code(), 0)?;
     result = result + UsciCode::calculate_char_weight(code02.get_code(), 1)?;
@@ -583,13 +583,13 @@ impl UsciCode {
     Ok(CODE_CHARS.get(result).unwrap().clone())
   }
 
-  fn calculate_char_weight(ch: char, index: usize) -> UsciResult<usize> {
+  fn calculate_char_weight(ch: char, index: usize) -> Result<usize> {
     match CODE_CHARS.binary_search(&ch) {
       Ok(position) => {
         Ok(CODE_WEIGHT.get(index).unwrap() * position)
       }
       Err(_) => {
-        Err(UsciError::CommonError(format!("Calculate Weight Error: {} {}", index, ch)))
+        bail!(format!("Calculate Weight Error: {} {}", index, ch))
       }
     }
   }
@@ -621,11 +621,12 @@ impl UsciCode {
 }
 
 impl FromStr for UsciCode {
-  type Err = UsciError;
 
-  fn from_str(code_str: &str) -> UsciResult<Self> {
+  type Err = anyhow::Error;
+
+  fn from_str(code_str: &str) -> Result<Self> {
     if code_str.len() != 18 {
-      return Err(UsciError::CommonError(format!("Parse Code Error: {}", code_str)));
+      bail!(format!("Parse Code Error: {}", code_str));
     }
     let mut code_chars = code_str.chars();
     let code01 = Code01::from_char(code_chars.next().unwrap())?;
@@ -642,7 +643,7 @@ impl FromStr for UsciCode {
     let code04 = Code04::new(code04_str.as_str())?;
     let code05_ch = UsciCode::calculate_code05(&code01, &code02, &code03, &code04)?;
     if code05_ch != code_chars.next().unwrap() {
-      return Err(UsciError::CommonError(format!("Verify Code05 Error: {}", code05_ch)));
+      bail!(format!("Verify Code05 Error: {}", code05_ch));
     }
     return Ok(UsciCode {
       code01,

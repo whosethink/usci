@@ -1,12 +1,11 @@
 mod usci;
-mod common;
 
 use std::io::{stdout, Write};
 use std::process::exit;
 use std::str::FromStr;
 use clap::Parser;
+use anyhow::Result;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
-use crate::common::UsciResult;
 use crate::usci::{Code01, Code02, Code03, Code04, Code05, UsciCode};
 
 fn main() {
@@ -33,7 +32,7 @@ fn main() {
   }
 }
 
-fn generate_command(command: GenerateCommand) -> UsciResult<()> {
+fn generate_command(command: GenerateCommand) -> Result<()> {
   let mut rng = rand::thread_rng();
   for _ in 0..command.count {
     let code = UsciCode::from_random(&mut rng);
@@ -42,7 +41,7 @@ fn generate_command(command: GenerateCommand) -> UsciResult<()> {
   Ok(())
 }
 
-fn verify_command(command: VerifyCommand) -> UsciResult<()> {
+fn verify_command(command: VerifyCommand) -> Result<()> {
   let mut stdout = StandardStream::stdout(ColorChoice::Auto);
   let mut color_spec = ColorSpec::new();
   for code_str in command.codes.iter() {
@@ -61,7 +60,7 @@ fn verify_command(command: VerifyCommand) -> UsciResult<()> {
   Ok(())
 }
 
-fn info_command(command: InfoCommand) -> UsciResult<()> {
+fn info_command(command: InfoCommand) -> Result<()> {
   let mut stdout = StandardStream::stdout(ColorChoice::Auto);
   let mut color_spec = ColorSpec::new();
   color_spec.set_bold(true);
