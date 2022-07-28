@@ -1,10 +1,11 @@
 mod usci;
 
-use std::io::{stdout, Write};
+use std::io::{BufRead, BufReader, stdout, Write};
+use std::path::PathBuf;
 use std::process::exit;
 use std::str::FromStr;
 use clap::Parser;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 use crate::usci::{Code01, Code02, Code03, Code04, Code05, UsciCode};
 
@@ -42,11 +43,9 @@ fn generate_command(command: GenerateCommand) -> Result<()> {
 }
 
 fn verify_command(command: VerifyCommand) -> Result<()> {
-  let mut stdout = StandardStream::stdout(ColorChoice::Auto);
-  let mut color_spec = ColorSpec::new();
-  for code_str in command.codes.iter() {
-    let code_result = UsciCode::from_str(code_str);
-    match code_result {
+
+  fn verify_code(code_str: &str, stdout: &mut StandardStream, color_spec: &mut ColorSpec) -> Result<()> {
+    match UsciCode::from_str(code_str) {
       Ok(_code) => {
         stdout.set_color(color_spec.set_fg(Some(Color::Green)))?;
         writeln!(stdout, "TRUE  {}", code_str)?;
@@ -54,6 +53,27 @@ fn verify_command(command: VerifyCommand) -> Result<()> {
       Err(_err) => {
         stdout.set_color(color_spec.set_fg(Some(Color::Red)))?;
         writeln!(stdout, "FALSE {}", code_str)?;
+      }
+    }
+    Ok(())
+  }
+
+  let mut stdout = StandardStream::stdout(ColorChoice::Auto);
+  let mut color_spec = ColorSpec::new();
+  for code_str in command.codes.iter() {
+    verify_code(code_str, &mut stdout, &mut color_spec)?;
+  }
+  if let Some(file_path) = command.file {
+    let file = std::fs::File::open(file_path)
+      .with_context(|| format!("Can not read file"))?;
+    let mut code_lines = BufReader::new(file).lines();
+    while let Some(code_result) = code_lines.next() {
+      if let Ok(code_line) = code_result {
+        for code_str in code_line.split(|c| char::is_whitespace(c) || c == ',') {
+          if !code_str.is_empty() {
+            verify_code(code_str, &mut stdout, &mut color_spec)?;
+          }
+        }
       }
     }
   }
@@ -111,8 +131,8 @@ struct GenerateCommand {
 #[derive(Debug, Parser)]
 struct VerifyCommand {
 
-  // #[clap(long = "file", short = 'f')]
-  // file: Option<PathBuf>,
+  #[clap(long = "file", short = 'f')]
+  file: Option<PathBuf>,
 
   codes: Vec<String>
 }
